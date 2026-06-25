@@ -1,0 +1,11 @@
+.codex/
+.agents/
+
+# Local datasets and experiment outputs are usually too large for Git.
+data/
+experiments/
+
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db

@@ -1,0 +1,34 @@
+project: "基于 EEG 的睡眠分期研究"
+created: "2026-06-25"
+timezone: "Asia/Shanghai"
+status: "first_literature_report_complete"
+scope:
+  task: "EEG/含 EEG PSG 的自动睡眠分期"
+  primary_labels: ["W", "N1", "N2", "N3", "REM"]
+  time_window: "2021-06-25 to 2026-06-25"
+  included:
+    - "人类 EEG 或含 EEG 的 PSG 睡眠分期"
+    - "单通道/少通道 EEG、跨数据集泛化、自监督/基础模型、可穿戴与临床落地"
+  excluded_as_primary:
+    - "睡眠呼吸暂停、失眠、RBD 等疾病检测"
+    - "纯 PPG/ECG 睡眠分期，除非用于下游或可穿戴背景对照"
+deliverables:
+  main_report: "to_human/eeg_sleep_staging_report.md"
+  literature_survey: "literature/survey.md"
+  core_paper_cards: "literature/papers/"
+counts:
+  screened_recent_papers: 37
+  core_reading_cards: 25
+  total_paper_cards: 31
+  key_datasets: 7
+current_findings:
+  - "近五年模型结构创新已从 CNN/RNN/Transformer 层面转向泛化、标注噪声、自监督预训练、任意传感器和临床可用性。"
+  - "Sleep-EDF 上的高准确率不应直接解释为临床可用；跨数据集、跨设备、跨年龄/疾病人群更能暴露真实问题。"
+  - "N1、转期片段和人工标注分歧是最稳定的难点，也是比继续堆模型更有研究价值的切入点。"
+recommended_next_direction:
+  title: "标签不确定性 + 跨数据集泛化的 EEG 睡眠分期"
+  rationale: "同时命中临床标注分歧、N1 难分类和跨数据集性能下降三类核心痛点，实验成本适中。"
+next_steps:
+  - "选择 Sleep-EDF + ISRUC + MASS/SHHS 的可获取组合，复现一个轻量基线。"
+  - "把 hard label 改为 uncertainty-aware 或 transition-aware 训练目标。"
+  - "用 leave-one-dataset-out 和 per-stage F1/kappa 做主评测。"

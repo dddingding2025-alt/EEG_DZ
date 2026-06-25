@@ -72,3 +72,31 @@
 3. **标签本身不稳定**：N1、转期 epoch、觉醒片段和人工评分分歧使 hard label 学习天然受限。
 4. **基础模型正在进入 EEG 睡眠分期**：REVE、Hypnos、AnySleep、PhysioOmni 等说明大规模预训练/多中心训练已经成为重要方向，但严格外部验证、计算成本和适配策略仍是问题。
 5. **可穿戴场景的关键在系统鲁棒性**：伪迹、通道缺失、低信噪比、设备差异和不确定性提示比单纯 accuracy 更关键。
+
+## 4. 方向1专题补充：N1、标签不确定性与跨数据集泛化
+
+本节用于支撑 `to_human/direction1_n1_uncertainty_cross_dataset_report.md`。它把 N1 难题拆成 class imbalance、label uncertainty 和 domain shift 三类机制。
+
+| # | 年份 | 类型 | 论文/资料 | 直接相关点 | 链接 |
+|---:|---:|---|---|---|---|
+| D1 | 2019 | Dataset/Anchor | Dreem Open Datasets: Multi-Scored Sleep Datasets | 5 位评分员、多评分员共识、人工一致性上限 | https://arxiv.org/abs/1911.03221 |
+| D2 | 2021 | Method | DeepSleepNet-Lite with Uncertainty Estimates | MC dropout、uncertain epochs、拒识 | https://arxiv.org/abs/2108.10600 |
+| D3 | 2021 | Method | SleepTransformer | Transformer、attention 解释、不确定性熵 | https://arxiv.org/abs/2105.11043 |
+| D4 | 2021 | Method | MSDAN | 明确针对 N1 表现差，多尺度注意力 | https://arxiv.org/abs/2107.08442 |
+| D5 | 2023 | Method | SleepEGAN | 少数类增强、class imbalance、ensemble | https://arxiv.org/abs/2307.05362 |
+| D6 | 2024 | DG | SleepDG / Generalizable Sleep Staging | 多数据集 domain generalization | https://arxiv.org/abs/2401.05363 |
+| D7 | 2024 | Adaptation | SPDIM | source-free adaptation、label shift | https://arxiv.org/abs/2411.07249 |
+| D8 | 2025 | Transfer | SelectiveFinetuning | source selection、negative transfer | https://arxiv.org/abs/2501.03764 |
+| D9 | 2025 | Interpretability | Retrieving Filter Spectra in CNN | EEG 频带解释，检查是否学到合理证据 | https://arxiv.org/abs/2502.06478 |
+| D10 | 2025 | Cross-domain | SleepDIFFormer | heterogeneous EEG/EOG、跨域对齐 | https://arxiv.org/abs/2508.15215 |
+| D11 | 2025 | TTA | StableSleep | source-free test-time adaptation、entropy gate | https://arxiv.org/abs/2509.02982 |
+| D12 | 2025 | Wearable SSL | Systematic Evaluation of SSL for Wearable EEG | 少标签、可穿戴、跨数据集泛化 | https://arxiv.org/abs/2510.07960 |
+| D13 | 2025 | N1 method | Context-Aware Temporal Modeling for Single-Channel EEG | N1 F1、上下文、class-weighted loss | https://arxiv.org/abs/2512.22976 |
+| D14 | 2026 | Clinical transfer | Fully-Automated Sleep Staging in PD/iRBD | 疾病人群迁移、人工二次评分、REM 置信阈值 | https://arxiv.org/abs/2602.09793 |
+| D15 | 2026 | Clinical gap | AI Generalisation Gap in Comorbid Sleep Disorder Staging | 病理人群泛化缺口、解释性错误分析 | https://arxiv.org/abs/2603.23582 |
+| D16 | 2026 | Noisy-label DG | FF-TRUST / NL-DGSS | noisy labels + multi-source domain generalization | https://arxiv.org/abs/2604.10009 |
+| D17 | 2026 | Cross-dataset DA | STDA-Net | Sleep-EDF 与 SHHS 跨数据集适配 | https://arxiv.org/abs/2605.06736 |
+| D18 | 2026 | FM eval | Multi-Dimensional EEG Foundation Model Evaluation | 低资源、少传感器、长上下文任务评测 | https://arxiv.org/abs/2605.28563 |
+| D19 | 2026 | Sleep FM | Hypnos / Next-Token Prediction | 大规模 sleep foundation model、label efficiency | https://arxiv.org/abs/2606.09605 |
+
+方向1的直接竞争线是 D6、D10、D16、D17；直接支撑标签不确定性的是 D1、D2、D3、D11；直接支撑 N1 难点的是 D4、D5、D13。

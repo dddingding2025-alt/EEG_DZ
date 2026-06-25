@@ -14,12 +14,15 @@ scope:
     - "纯 PPG/ECG 睡眠分期，除非用于下游或可穿戴背景对照"
 deliverables:
   main_report: "to_human/eeg_sleep_staging_report.md"
+  direction1_report: "to_human/direction1_n1_uncertainty_cross_dataset_report.md"
+  direction1_protocol: "experiments/n1_label_uncertainty_cross_dataset/protocol.md"
   literature_survey: "literature/survey.md"
   core_paper_cards: "literature/papers/"
 counts:
   screened_recent_papers: 37
   core_reading_cards: 25
-  total_paper_cards: 31
+  direction1_targeted_entries: 19
+  total_paper_cards: 40
   key_datasets: 7
 current_findings:
   - "近五年模型结构创新已从 CNN/RNN/Transformer 层面转向泛化、标注噪声、自监督预训练、任意传感器和临床可用性。"
@@ -28,7 +31,8 @@ current_findings:
 recommended_next_direction:
   title: "标签不确定性 + 跨数据集泛化的 EEG 睡眠分期"
   rationale: "同时命中临床标注分歧、N1 难分类和跨数据集性能下降三类核心痛点，实验成本适中。"
+  current_focus: "N1 与转期 epoch 的 label uncertainty，不把 class imbalance、label uncertainty、domain shift 混为同一问题。"
 next_steps:
-  - "选择 Sleep-EDF + ISRUC + MASS/SHHS 的可获取组合，复现一个轻量基线。"
-  - "把 hard label 改为 uncertainty-aware 或 transition-aware 训练目标。"
-  - "用 leave-one-dataset-out 和 per-stage F1/kappa 做主评测。"
+  - "先用 Sleep-EDF + ISRUC 设计最小实验协议，不下载数据、不训练模型前先锁定预处理和指标。"
+  - "比较 hard CE、class-weighted CE、focal loss、stage-adjacent smoothing、transition-aware smoothing。"
+  - "主评测使用 N1 F1、REM F1、macro-F1、kappa、transition-window F1 和 ECE/calibration。"

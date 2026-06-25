@@ -26,3 +26,15 @@ EEG 睡眠分期的标准任务通常把连续 PSG/EEG 切成 30 秒 epoch，并
 优先做“标签不确定性 + 跨数据集泛化”的 EEG 睡眠分期研究。可检验假设是：显式建模人工评分不确定性、转期边界和阶段相邻性，可以比 hard-label 训练在外部数据集上更稳定，尤其改善 N1 和转期片段。
 
 建议第一版实验只使用可公开获取的数据，先复现轻量 CNN/Transformer baseline，再加入 uncertainty-aware loss、transition-aware smoothing 或 multi-rater/soft-label 代理机制。主指标应为 macro-F1、Cohen's kappa、per-stage F1、N1 F1 和 leave-one-dataset-out 表现。
+
+## 方向1深化：N1 标签不确定性
+
+跨数据集泛化的含义是：模型在一个或多个数据集上训练后，在另一个未见过的数据集上测试。它比同数据集内划分更接近真实部署，因为导联、采样率、滤波、设备、人群、疾病构成和评分员习惯都会变化。
+
+N1 难题不能归结为单一“模型不够强”。当前需要分开处理三类机制：
+
+- Class imbalance：N1 样本少，模型偏向 W/N2；可用 class weight、focal loss、GAN/SMOTE、balanced sampler 作为基线。
+- Label uncertainty：N1 与转期 epoch 的人工评分分歧高；应测试 soft label、multi-rater consensus、uncertainty loss、reject option。
+- Domain shift：换数据集/设备/人群后，N1 的弱特征更容易失效；应测试 leave-one-dataset-out、domain alignment、source selection、test-time adaptation。
+
+下一步最小实验假设：stage-adjacent label smoothing 和 transition-aware smoothing 应优先改善 cross-dataset N1 F1、transition-window F1 和 calibration，而不一定显著提升 overall accuracy。

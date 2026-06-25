@@ -1,7 +1,8 @@
 project: "基于 EEG 的睡眠分期研究"
 created: "2026-06-25"
 timezone: "Asia/Shanghai"
-status: "first_literature_report_complete"
+status: "second_literature_report_complete"
+active_direction: "transition-aware long-context EEG sleep staging"
 scope:
   task: "EEG/含 EEG PSG 的自动睡眠分期"
   primary_labels: ["W", "N1", "N2", "N3", "REM"]
@@ -16,23 +17,28 @@ deliverables:
   main_report: "to_human/eeg_sleep_staging_report.md"
   direction1_report: "to_human/direction1_n1_uncertainty_cross_dataset_report.md"
   direction1_protocol: "experiments/n1_label_uncertainty_cross_dataset/protocol.md"
+  direction2_report: "to_human/transition_aware_sleep_staging_report.md"
+  direction2_survey: "literature/transition_context_survey.md"
+  direction2_protocol: "experiments/transition-aware-long-context/protocol.md"
   literature_survey: "literature/survey.md"
   core_paper_cards: "literature/papers/"
 counts:
   screened_recent_papers: 37
   core_reading_cards: 25
   direction1_targeted_entries: 19
-  total_paper_cards: 40
+  direction2_targeted_entries: 20
+  total_paper_cards: 48
   key_datasets: 7
 current_findings:
   - "近五年模型结构创新已从 CNN/RNN/Transformer 层面转向泛化、标注噪声、自监督预训练、任意传感器和临床可用性。"
   - "Sleep-EDF 上的高准确率不应直接解释为临床可用；跨数据集、跨设备、跨年龄/疾病人群更能暴露真实问题。"
   - "N1、转期片段和人工标注分歧是最稳定的难点，也是比继续堆模型更有研究价值的切入点。"
 recommended_next_direction:
-  title: "标签不确定性 + 跨数据集泛化的 EEG 睡眠分期"
-  rationale: "同时命中临床标注分歧、N1 难分类和跨数据集性能下降三类核心痛点，实验成本适中。"
-  current_focus: "N1 与转期 epoch 的 label uncertainty，不把 class imbalance、label uncertainty、domain shift 混为同一问题。"
+  title: "transition-centered evaluation + lightweight sequence regularization for EEG sleep staging"
+  rationale: "用户选择转期感知长上下文作为第一篇文章方向；最佳切口是评估和改善 hypnogram 边界行为，而不是提出另一个长上下文 Transformer。"
+  current_focus: "比较不同上下文长度对不同阶段转换的帮助，并用轻量 transition-aware regularization 减少边界错误。"
 next_steps:
-  - "先用 Sleep-EDF + ISRUC 设计最小实验协议，不下载数据、不训练模型前先锁定预处理和指标。"
-  - "比较 hard CE、class-weighted CE、focal loss、stage-adjacent smoothing、transition-aware smoothing。"
-  - "主评测使用 N1 F1、REM F1、macro-F1、kappa、transition-window F1 和 ECE/calibration。"
+  - "实现 hypnogram transition metrics。"
+  - "准备 Sleep-EDF subject-independent baseline。"
+  - "比较 single epoch、5 min、30 min、90 min、full-night context。"
+  - "加入 transition-aware sample weighting 和 boundary-aware consistency loss。"

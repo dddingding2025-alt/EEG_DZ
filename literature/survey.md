@@ -73,6 +73,23 @@
 4. **基础模型正在进入 EEG 睡眠分期**：REVE、Hypnos、AnySleep、PhysioOmni 等说明大规模预训练/多中心训练已经成为重要方向，但严格外部验证、计算成本和适配策略仍是问题。
 5. **可穿戴场景的关键在系统鲁棒性**：伪迹、通道缺失、低信噪比、设备差异和不确定性提示比单纯 accuracy 更关键。
 
+## 4. 第二轮专题补充：转期感知长上下文
+
+用户选择“转期感知长上下文睡眠分期”作为第一篇文章方向后，补充筛选了 20 篇 temporal context / transition-aware / whole-cycle / high-resolution staging 相关论文。详表见 `literature/transition_context_survey.md`。
+
+新增重点条目：
+
+| 年份 | 论文 | 价值 | 链接 |
+|---:|---|---|---|
+| 2022 | TransSleep | 直接使用 stage-transition detection 辅助任务，是转期感知最直接近邻 | https://arxiv.org/abs/2203.12590 |
+| 2023 | L-SeqSleepNet | whole-cycle long sequence modeling，支撑 90 分钟上下文实验条件 | https://arxiv.org/abs/2301.03441 |
+| 2023 | Continuous sleep depth | 提供“睡眠状态连续而非硬边界”的理论动机 | https://arxiv.org/abs/2301.06755 |
+| 2023 | S4Sleep | 结构化状态空间模型，适合做强序列建模背景 | https://arxiv.org/abs/2310.06715 |
+| 2024 | Long-range correlations analysis | 反例：单纯拉长上下文未必提升 | https://arxiv.org/abs/2402.17779 |
+| 2025 | NeuroLingua | 3 秒 token + 7 epoch 层级上下文 | https://arxiv.org/abs/2511.09773 |
+| 2025 | AnySleep | adjustable temporal resolution，说明 30 秒 epoch 不是自然边界 | https://arxiv.org/abs/2512.14461 |
+| 2025 | Context-Aware Temporal Modeling | 强调 N1、局部-长程上下文和可解释性 | https://arxiv.org/abs/2512.22976 |
+
 ## 4. 方向1专题补充：N1、标签不确定性与跨数据集泛化
 
 本节用于支撑 `to_human/direction1_n1_uncertainty_cross_dataset_report.md`。它把 N1 难题拆成 class imbalance、label uncertainty 和 domain shift 三类机制。

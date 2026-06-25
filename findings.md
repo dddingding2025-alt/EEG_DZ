@@ -27,6 +27,14 @@ EEG 睡眠分期的标准任务通常把连续 PSG/EEG 切成 30 秒 epoch，并
 
 建议第一版实验只使用可公开获取的数据，先复现轻量 CNN/Transformer baseline，再加入 uncertainty-aware loss、transition-aware smoothing 或 multi-rater/soft-label 代理机制。主指标应为 macro-F1、Cohen's kappa、per-stage F1、N1 F1 和 leave-one-dataset-out 表现。
 
+## 第二轮聚焦：转期感知长上下文
+
+用户明确偏好将“转期感知的长上下文睡眠分期”作为第一篇文章方向。第二轮调研后的判断是：该方向可行，但文章必须避免写成普通长上下文模型。已有 DeepSleepNet/SeqSleepNet/IITNet/SleepTransformer/L-SeqSleepNet/S4Sleep/Mamba/NeuroLingua 等工作已经覆盖大量上下文建模。
+
+更合适的贡献是 transition-centered evaluation protocol 加轻量 sequence regularization。主问题从“上下文越长越好吗”改为“哪些睡眠阶段转换需要多长上下文，以及怎样减少边界错误而不抹掉真实短觉醒”。
+
+建议下一步优先实现 hypnogram transition metrics，再在 Sleep-EDF 上比较 single epoch、5 min、30 min、90 min、full-night context。主指标使用 transition-window macro-F1、boundary delay、fragmentation error 和 transition calibration。若长上下文收益不显著，可转为负结果分析：睡眠分期需要合适上下文，而非无限长上下文。
+
 ## 方向1深化：N1 标签不确定性
 
 跨数据集泛化的含义是：模型在一个或多个数据集上训练后，在另一个未见过的数据集上测试。它比同数据集内划分更接近真实部署，因为导联、采样率、滤波、设备、人群、疾病构成和评分员习惯都会变化。

@@ -8,6 +8,11 @@
 - 完成第一轮文献筛选：37 篇近五年论文/预印本，25 篇核心分析条目，31 张论文卡片，7 个常用数据源。
 - 形成中文汇报：`to_human/eeg_sleep_staging_report.md`。
 - 主要判断：下一步最值得推进的是“标签不确定性与跨数据集泛化”，而不是单纯提出一个新 Transformer 变体。
+- 用户选择继续深挖“转期感知的长上下文睡眠分期”作为第一篇文章方向。
+- 建立 20 分钟 heartbeat：`autoresearch-transition-aware-sleep-staging`，用于持续推进本线程 autoresearch。
+- 完成第二轮专题调研：新增 `literature/transition_context_survey.md`、`to_human/transition_aware_sleep_staging_report.md`、`experiments/transition-aware-long-context/protocol.md`。
+- 新增关键论文卡片：TransSleep、L-SeqSleepNet、S4Sleep、长相关性分析、continuous sleep depth、NeuroLingua、context-aware temporal modeling、ProductGraphSleepNet。
+- 第二轮判断：该方向可作为第一篇文章，但贡献应聚焦 transition-centered evaluation 和轻量 sequence regularization，而非单纯更长上下文模型。
 
 ## 2026-06-25 方向1深化
 

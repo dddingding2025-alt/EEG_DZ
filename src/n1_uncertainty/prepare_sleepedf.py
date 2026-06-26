@@ -202,16 +202,19 @@ def convert_pair(
             "reason": "no_events",
         }
 
+    present_event_ids = {int(code) for code in events[:, 2]}
+    present_event_id = {name: code for name, code in RAW_EVENT_ID.items() if code in present_event_ids}
     tmax = epoch_seconds - 1.0 / float(raw.info["sfreq"])
     epochs = mne.Epochs(
         raw,
         events,
-        event_id=RAW_EVENT_ID,
+        event_id=present_event_id,
         tmin=0,
         tmax=tmax,
         baseline=None,
         preload=True,
         picks=[channel],
+        on_missing="ignore",
         verbose="ERROR",
     )
     x = epochs.get_data().astype(np.float32, copy=False)
@@ -224,6 +227,7 @@ def convert_pair(
         "sfreq": float(raw.info["sfreq"]),
         "psg": str(psg_path),
         "hypnogram": str(hyp_path),
+        "present_stages": sorted(present_event_id),
         "label_counts": {STAGE_NAMES[i]: int((y == i).sum()) for i in range(len(STAGE_NAMES))},
     }
     return x, y, meta

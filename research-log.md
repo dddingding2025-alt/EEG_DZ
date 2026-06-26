@@ -57,3 +57,10 @@
 - 新增实验配置：`smoke_synthetic.yaml`、`baseline_sleepedf.yaml`、`softlabel_sleepedf.yaml`、`replicate_isruc.yaml`、`tgcm_sleepedf.yaml`。
 - 新增协作指南：`to_human/github_server_collaboration_guide.md`，规定服务器部署、tmux 运行、结果同步和 Codex 监控逻辑。
 - 本机 Python 不可访问，未能执行本地 Python smoke test；应由服务器先执行 `bash scripts/remote/run_experiment.sh --smoke`。
+
+## 2026-06-26 数据格式检查
+
+- 用户已将 Sleep-EDF 数据下载到服务器 `~/data`，但不确定是否符合训练入口要求。
+- 新增服务器检查脚本：`scripts/remote/inspect_data.sh sleepedf`。
+- 新增检查模块：`src/n1_uncertainty/inspect_data.py`，可判定 `ready_npz`、`npz_at_nonstandard_path`、`raw_edf_needs_conversion` 或 `missing`。
+- 当前训练入口仍要求 `$DATA_ROOT/sleepedf/preprocessed.npz`，包含 `x`、`y`、`subject` 三个数组；如果检查结果是 raw EDF，下一步需要实现或运行 EDF->NPZ 转换。

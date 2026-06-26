@@ -44,6 +44,24 @@ NPZ 必须包含：
 
 ## 3. 服务器 smoke test
 
+先检查数据格式：
+
+```bash
+conda activate eeg-n1
+cd EEG_DZ
+export DATA_ROOT=~/data
+bash scripts/remote/inspect_data.sh sleepedf
+```
+
+如果输出 `verdict: ready_npz`，可以直接跑真实训练。
+如果输出 `verdict: raw_edf_needs_conversion`，说明你现在是原始 Sleep-EDF `.edf` 文件，还需要先转换成：
+
+```text
+$DATA_ROOT/sleepedf/preprocessed.npz
+```
+
+该 NPZ 需要包含 `x`、`y`、`subject` 三个数组。
+
 ```bash
 tmux new -s n1_smoke
 conda activate eeg-n1

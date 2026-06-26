@@ -62,6 +62,28 @@ $DATA_ROOT/sleepedf/preprocessed.npz
 
 该 NPZ 需要包含 `x`、`y`、`subject` 三个数组。
 
+Sleep-EDF 原始 EDF 转换命令：
+
+```bash
+conda activate eeg-n1
+cd EEG_DZ
+git pull --ff-only
+pip install -r requirements.txt
+export DATA_ROOT=~/data
+bash scripts/remote/prepare_sleepedf.sh
+bash scripts/remote/inspect_data.sh sleepedf
+```
+
+如果想先快速试转两晚数据：
+
+```bash
+export MAX_PAIRS=2
+bash scripts/remote/prepare_sleepedf.sh
+unset MAX_PAIRS
+```
+
+默认行为：提取 `Fpz-Cz`，按 30 秒 epoch，采样率重采样到 100 Hz，合并 Sleep stage 3/4 为 N3，并保留入睡前后各 30 分钟清醒片段。
+
 ```bash
 tmux new -s n1_smoke
 conda activate eeg-n1

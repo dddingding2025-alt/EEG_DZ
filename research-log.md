@@ -64,3 +64,11 @@
 - 新增服务器检查脚本：`scripts/remote/inspect_data.sh sleepedf`。
 - 新增检查模块：`src/n1_uncertainty/inspect_data.py`，可判定 `ready_npz`、`npz_at_nonstandard_path`、`raw_edf_needs_conversion` 或 `missing`。
 - 当前训练入口仍要求 `$DATA_ROOT/sleepedf/preprocessed.npz`，包含 `x`、`y`、`subject` 三个数组；如果检查结果是 raw EDF，下一步需要实现或运行 EDF->NPZ 转换。
+
+## 2026-06-26 Sleep-EDF 转换脚本
+
+- 根据用户服务器输出，确认 `~/data` 下为原始 Sleep-EDF EDF：197 个 PSG、197 个 Hypnogram。
+- 新增转换模块：`src/n1_uncertainty/prepare_sleepedf.py`。
+- 新增服务器脚本：`scripts/remote/prepare_sleepedf.sh`。
+- 默认转换为 `$DATA_ROOT/sleepedf/preprocessed.npz`，包含 `x`、`y`、`subject`、`night`、`stage_names`、`metadata`。
+- 默认提取 `Fpz-Cz`，30 秒 epoch，目标采样率 100 Hz，Sleep stage 3/4 合并为 N3，剔除非 W/N1/N2/N3/REM 注释，保留睡眠段前后各 30 分钟 W。

@@ -1,0 +1,27 @@
+name: replicate_isruc
+stage: phase3_isruc_replication
+runs_root: experiments/transition_uncertainty_guided_n1/runs
+data:
+  synthetic: false
+  dataset: isruc
+  format: npz
+  path: ${DATA_ROOT}/isruc/preprocessed.npz
+transition:
+  k: 2
+training:
+  seed: 42
+  epochs: 20
+  batch_size: 128
+  lr: 0.001
+variants:
+  - id: hard_ce
+    loss: hard_ce
+  - id: class_weighted_ce
+    loss: class_weighted
+  - id: uniform_smoothing
+    loss: uniform_smoothing
+    epsilon: 0.1
+  - id: hybrid_softlabel_downweight
+    loss: hybrid
+    epsilon: 0.05
+    transition_epsilon: 0.15

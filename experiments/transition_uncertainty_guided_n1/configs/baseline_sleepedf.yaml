@@ -1,0 +1,29 @@
+name: baseline_sleepedf
+stage: phase1_sleepedf_baseline
+runs_root: experiments/transition_uncertainty_guided_n1/runs
+data:
+  synthetic: false
+  dataset: sleepedf
+  format: npz
+  path: ${DATA_ROOT}/sleepedf/preprocessed.npz
+transition:
+  k: 2
+training:
+  seed: 42
+  epochs: 20
+  batch_size: 128
+  lr: 0.001
+variants:
+  - id: hard_ce
+    loss: hard_ce
+  - id: class_weighted_ce
+    loss: class_weighted
+  - id: focal_loss
+    loss: focal
+    gamma: 2.0
+  - id: balanced_sampler
+    loss: hard_ce
+    sampler: balanced
+  - id: uniform_smoothing
+    loss: uniform_smoothing
+    epsilon: 0.1

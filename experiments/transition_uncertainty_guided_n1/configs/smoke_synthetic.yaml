@@ -1,0 +1,9 @@
+name: smoke_synthetic
+stage: phase0_smoke
+runs_root: experiments/transition_uncertainty_guided_n1/runs
+data:
+  synthetic: true
+transition:
+  k: 2
+training:
+  seed: 42

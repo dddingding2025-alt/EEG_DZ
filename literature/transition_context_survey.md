@@ -9,6 +9,7 @@
 - 直接把“转期”作为训练对象的代表工作是 TransSleep；直接把“整周期上下文”作为核心的代表工作是 L-SeqSleepNet。
 - S4Sleep 及其长相关性分析给出重要反例：模型具备长程建模能力，不代表把上下文拉长到数百 epoch 就一定提升。
 - 30 秒 epoch 是临床评分习惯和工程折中，不是自然生理边界；AnySleep 等工作已经开始转向 sub-30-second / high-resolution scoring。
+- 2026-06-26 统一规划后，TGCM 不再作为第一阶段默认主标题，而是作为 N1 标签不确定性方法之后的上下文增强模块。
 
 ## 文献表
 
@@ -37,8 +38,7 @@
 
 ## 对本项目的直接启发
 
-1. **不要只比较上下文长度**：S4Sleep 长相关性分析已经提示上下文越长不一定越好。我们的实验必须回答“哪些转期需要上下文、哪些不需要”。
-2. **转期要成为评测对象**：TransSleep 做了 transition detection 辅助任务，但常规论文仍缺少 transition-window macro-F1、boundary delay、fragmentation error 等主指标。
-3. **方法要轻量**：第一篇文章应固定 backbone，加入 transition-aware loss/decoding/metrics，避免陷入大模型工程。
+1. **不要只比较上下文长度**：S4Sleep 长相关性分析已经提示上下文越长不一定越好。我们的实验必须回答“模型如何按转期状态选择上下文”，而不是只回答“上下文多长最好”。
+2. **TransSleep 是最近邻，不能只复刻辅助任务**：TransSleep 已经做 transition detection，因此本文应把 transition probability 用作 context gate 的调制信号，证明收益来自自适应上下文融合。
+3. **TGCM 是方法核心**：第一篇文章应固定 backbone，提出 short/mid/long 多尺度上下文分支和 transition-guided context gate，把指标作为机制验证证据。
 4. **高分辨率是远期扩展**：AnySleep 支持 sub-30-second 方向，但第一版可以先用 30 秒 hypnogram 标签定义转期窗口，不依赖额外标注。
-

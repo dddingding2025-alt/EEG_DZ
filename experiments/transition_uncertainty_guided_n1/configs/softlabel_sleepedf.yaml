@@ -1,0 +1,30 @@
+name: softlabel_sleepedf
+stage: phase2_sleepedf_softlabel
+runs_root: experiments/transition_uncertainty_guided_n1/runs
+data:
+  synthetic: false
+  dataset: sleepedf
+  format: npz
+  path: ${DATA_ROOT}/sleepedf/preprocessed.npz
+transition:
+  k: 2
+training:
+  seed: 42
+  epochs: 20
+  batch_size: 128
+  lr: 0.001
+variants:
+  - id: stage_adjacent_eps_005
+    loss: stage_adjacent
+    epsilon: 0.05
+  - id: stage_adjacent_eps_010
+    loss: stage_adjacent
+    epsilon: 0.10
+  - id: transition_smoothing
+    loss: transition_smoothing
+    epsilon: 0.05
+    transition_epsilon: 0.15
+  - id: hybrid_softlabel_downweight
+    loss: hybrid
+    epsilon: 0.05
+    transition_epsilon: 0.15

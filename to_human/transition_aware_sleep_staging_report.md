@@ -1,216 +1,231 @@
-# 转期感知长上下文 EEG 睡眠分期：第二轮深入汇报
+# TGCM：转期机制驱动的自适应上下文 EEG 睡眠分期
 
-日期：2026-06-25  
-目标：判断“转期感知的长上下文睡眠分期”是否适合作为第一篇文章，并把研究点细化到可实验验证。
+日期：2026-06-26
+目标：把“转期感知长上下文”从实验评测型方向，重构为统一 N1 研究规划中的第二阶段自适应上下文增强模块。
 
-## 1. 结论先行
+2026-06-26 统一规划更新：TGCM 现在作为“转期不确定性引导的 N1 识别”的第二阶段增强模块，而不是第一篇文章的默认主标题。第一阶段先验证 N1 标签不确定性与阶段相邻 soft label。
 
-这个方向适合作为第一篇文章，但需要控制叙事重点。
+## 1. 核心结论
 
-不建议把文章写成“我们提出一个更长上下文 Transformer”。这条线已经有 SleepTransformer、SeqSleepNet/L-SeqSleepNet、S4Sleep、Mamba、NeuroLingua 等大量工作。更稳妥的文章定位是：
+当前方向应正式收束为：
 
-> **把睡眠分期从普通 epoch-level 分类，重新聚焦到 transition-centered evaluation：哪些阶段转换真正需要上下文，什么样的轻量序列约束能减少边界错误。**
+> **Transition-Guided Context Modulation (TGCM)：用转期机制动态调节 EEG 睡眠分期中的上下文尺度。**
 
-这个定位的好处是：实现成本低、实验故事清晰、能绕开“纯模型结构创新不足”的问题，也能把 N1 难识别、转期不确定性、hypnogram 碎片化这些领域痛点串起来。
+这比“比较不同上下文长度”或“增加转期评测指标”更适合作为第一篇方法论文。文章主张不再是“长上下文是否有用”，而是：
 
-## 2. 现在大家是怎么做的
+> 不同 epoch 对上下文的需求不同。稳定睡眠片段不需要强长上下文平滑；转期和标签不确定区域需要更多多尺度上下文来判断边界。
 
-### 2.1 经典序列建模：CNN 提特征，RNN/Transformer 学上下文
+因此，本文应主打一个明确方法模块：模型先估计每个 epoch 的转期风险，再用该风险动态融合 short / mid / long 多尺度上下文表示。转期指标仍然重要，但它们是证明 TGCM 有效的证据，不是论文的主要创新点。
 
-DeepSleepNet、SeqSleepNet、IITNet、XSleepNet 这类工作把睡眠分期从单 epoch 分类推进到 sequence-to-sequence。典型逻辑是：
+## 2. 与已有工作的边界
 
-- 先用 CNN、滤波器或频谱编码提取每个 30 秒 epoch 的局部特征；
-- 再用 BiLSTM、RNN、Transformer 或 attention 学习相邻 epoch 关系；
-- 最后仍按每个 epoch 的 W/N1/N2/N3/REM 标签计算 accuracy、macro-F1、kappa。
+### 2.1 不能写成“更长上下文模型”
 
-这条线证明了上下文有价值。IITNet 报告短上下文已经能明显提升 N1、REM 等阶段，但上下文长度超过几个 epoch 后收益变小。这对我们很关键：**上下文不是越长越好，第一篇文章应该验证“转期需要多长上下文”。**
+SleepTransformer、SeqSleepNet、L-SeqSleepNet、S4Sleep、Mamba/SSM 类模型已经证明上下文建模有价值。尤其 L-SeqSleepNet 已经把 90 分钟 whole-cycle 作为建模单位，S4Sleep 及长相关性分析也提示单纯拉长上下文并不稳定带来收益。
 
-### 2.2 转期显式建模：代表是 TransSleep，但空间还没被吃完
+所以本文不能把贡献写成“我们用了更长上下文”。
 
-TransSleep 是最直接的近邻工作。它把 transitioning epochs 和 confusing stages 作为关键问题，设计了：
+### 2.2 不能只写成“转期辅助任务”
 
-- multi-scale feature extractor；
-- stage-confusion estimator；
-- context encoder；
-- stage-transition detection 辅助任务。
+TransSleep 已经直接把 transitioning epochs 和 confusing stages 作为问题，使用 stage-confusion estimator 和 stage-transition detection 辅助任务。因此，如果我们只加一个 transition detection head，创新性不足。
 
-它说明“转期感知”不是空白点。但它仍主要用常规 sleep staging 指标讲结果，缺少系统的 transition-window 指标、boundary delay、hypnogram fragmentation 等评测。我们的切入点不是重复它的辅助任务，而是建立更明确的边界评估和轻量正则框架。
+我们的边界应是：
 
-### 2.3 Whole-cycle 长上下文：L-SeqSleepNet 是强近邻
+- TransSleep 用转期辅助任务增强上下文编码；
+- TGCM 用转期概率作为控制信号，动态决定上下文尺度的融合方式；
+- TGCM 的重点不是“检测转期”，而是“转期机制如何调制上下文依赖”。
 
-L-SeqSleepNet 从睡眠约 90 分钟周期出发，做 whole-cycle long sequence modeling。它在多个数据库和不同 EEG setup 上验证，并报告对 N2 主导问题和低性能被试的鲁棒性改善。
+### 2.3 评测协议是辅助贡献
 
-它给我们两个启发：
+transition-window macro-F1、boundary delay、fragmentation error 等指标仍保留，但不再作为第一贡献。它们用于回答：
 
-- 90 分钟 whole-cycle 是合理实验条件，不是随便定的长度；
-- 如果只说“睡眠有周期，所以我们用 90 分钟上下文”，创新性已经不够。
+- TGCM 是否真的改善转期窗口；
+- TGCM 是否减少边界延迟；
+- TGCM 是否避免固定长上下文带来的过度平滑；
+- TGCM 的 gate 是否在稳定区偏短上下文、在转期区偏中长上下文。
 
-因此我们的实验应把 90 分钟作为一个对照长度，而不是唯一贡献。
+## 3. 方法设计
 
-### 2.4 S4/Mamba 等长序列模型：高效，但不自动等于更有用
+### 3.1 输入与基础表示
 
-S4Sleep 系列工作系统探索了 encoder-predictor 设计空间，并用 structured state space model 做序列建模。后续 “Assessing the importance of long-range correlations” 进一步测试把输入拉长到数百 epoch，结论是单纯增加上下文没有明显收益。
+输入为连续 EEG hypnogram 对齐的 30 秒 epoch 序列：
 
-这对我们的选题是约束，也是机会。文章不能假设“长上下文必然更好”。更有价值的问题是：
+```text
+X = [x_1, x_2, ..., x_T]
+y_t in {W, N1, N2, N3, REM}
+```
 
-- W-N1-N2 边界需要几分钟上下文？
-- N2-N3 边界是否主要由局部慢波决定？
-- NREM-REM 转换是否需要更长的睡眠周期信息？
-- 超长上下文是否只改善少数被试或特定转期？
+每个 epoch 先经过共享 epoch encoder：
 
-### 2.5 高分辨率和连续睡眠表征：说明 30 秒标签本身有问题
+```text
+h_t = Encoder(x_t)
+```
 
-AnySleep 指出 30 秒 epoch 是传统 PSG 评分习惯，并不是生理上的自然边界，且模型可以做 adjustable temporal resolution。Continuous sleep depth 工作则说明睡眠深度可能更像连续变量，而不是硬切成五类。
+第一版不需要追求复杂 encoder。推荐使用轻量 CNN/TCN 或 TinySleepNet-style encoder，保证主创新集中在 TGCM，而不是底层特征提取。
 
-这为我们提供了理论动机：转期窗口不是简单“难样本”，而是离散标签对连续生理状态的粗切分。第一版实验仍可使用 30 秒 hypnogram，但评测必须承认边界附近标签更不稳定。
+### 3.2 多尺度上下文分支
 
-## 3. 现有工作的主要问题
+在 epoch 表征序列上并行构建三个上下文分支：
 
-### 问题 1：评测目标和临床痛点不匹配
+- **short context**：约 5 分钟，捕捉 W-N1-N2 入睡边界和局部相邻关系；
+- **mid context**：约 30 分钟，捕捉 N2-N3、NREM-REM 等中程结构；
+- **long context**：约 90 分钟，捕捉睡眠周期和 REM 周期信息。
 
-多数论文优化 overall accuracy、macro-F1、kappa。它们可以证明模型整体不错，但回答不了：
+每个分支输出对应尺度的上下文表示：
 
-- 模型是否把阶段转换提前或滞后了？
-- 模型是否把一段稳定 N2 切成很多碎片？
-- 模型是否把短觉醒抹平了？
-- 模型是否在 W-N1-N2 这种关键入睡边界上改善？
+```text
+c_t^S = Context_S(h_{t-r_s:t+r_s})
+c_t^M = Context_M(h_{t-r_m:t+r_m})
+c_t^L = Context_L(h_{t-r_l:t+r_l})
+```
 
-这些问题对 hypnogram 质量更直接，但常规指标不敏感。
+第一版可以用 depthwise TCN、轻量 Transformer encoder 或 BiGRU 实现这些分支。关键是三个分支容量尽量接近，避免结果被参数量解释。
 
-### 问题 2：上下文长度比较不系统
+### 3.3 转期概率作为调制信号
 
-已有工作常选择某个上下文长度，然后报告性能。少数工作比较长度，但仍主要看总体指标。真正应该比较的是：
+由 epoch 表征和局部上下文预测当前 epoch 是否处于转期窗口：
 
-- 单 epoch 是否足够区分 N2-N3？
-- 5 分钟上下文是否足够改善 N1？
-- 30 分钟上下文是否帮助 NREM-REM？
-- 90 分钟 whole-cycle 是否只在 REM 周期或异常被试上有效？
+```text
+p_t^B = TransitionHead([h_t, c_t^S])
+```
 
-如果不按转期类型拆开看，很容易得出“长上下文没用”或“长上下文有用”的粗糙结论。
+转期标签不需要额外人工标注，可由 hypnogram 自动生成：
 
-### 问题 3：序列平滑可能制造新的错误
+```text
+b_t = 1, if exists boundary tau where |t - tau| <= k
+b_t = 0, otherwise
+```
 
-很多 sequence model 或 post-processing 会让 hypnogram 更平滑。平滑能减少孤立误判，但也可能：
+其中 boundary 定义为 `y_t != y_{t-1}`。默认 `k = 2`，即真实边界前后约 1 分钟。
 
-- 抹掉真实短觉醒；
-- 延迟阶段转换；
-- 降低 N1 召回；
-- 把模型错误伪装成更稳定的 hypnogram。
+### 3.4 Transition-Guided Context Gate
 
-所以 sequence regularization 不能无差别施加，必须 boundary-aware。
+TGCM 的核心是一个 context gate：
 
-### 问题 4：N1 难题和转期难题没有被统一处理
+```text
+g_t = softmax(MLP([h_t, c_t^S, p_t^B]))
+z_t = g_t^S c_t^S + g_t^M c_t^M + g_t^L c_t^L
+```
 
-N1 难识别不是单纯类别不均衡。它本质上是清醒到睡眠的过渡阶段，人工标注也更不稳定。把 N1 当作普通少数类，只靠 class weighting 或 SMOTE，可能改善有限。
+直观约束是：
 
-更合理的处理方式是把 N1 放在 W-N1-N2 转换链条里分析：模型到底是把 N1 判成 W，还是直接跳到 N2？这种错误是否发生在真实边界附近？
+- 稳定区：`g_t^S` 应较高，减少过度平滑和长上下文噪声；
+- 转期区：`g_t^M` / `g_t^L` 可以提高，用更多上下文判断阶段边界；
+- N1 相关转期：更依赖 short/mid context；
+- NREM-REM 相关转期：可能更依赖 mid/long context。
 
-## 4. 我们可以怎么入手
+最终分类：
 
-### 入手点 A：建立 transition-centered evaluation protocol
+```text
+y_hat_t = StageClassifier([h_t, z_t])
+```
 
-这是最低成本、最稳的贡献。定义一套只依赖 hypnogram 标签和模型概率输出的转期指标：
+## 4. 训练目标
 
-- **transition-window macro-F1**：只在真实边界前后 k 个 epoch 内计算 macro-F1。
-- **per-transition F1**：分别看 W-N1、N1-N2、N2-N3、N2-REM、REM-W 等常见转换。
-- **boundary delay**：真实边界和最近预测边界的偏移，单位为 epoch。
-- **transition precision/recall**：把 `label_t != label_{t-1}` 当作边界检测事件。
-- **noncanonical transition rate**：预测序列中训练集低频跳变的比例。注意不要绝对称 illegal，因为病理睡眠可能出现非常规跳变。
-- **fragmentation error**：预测每小时转移次数与真实 hypnogram 的差异。
-- **transition calibration**：用相邻 epoch 概率分布估计 change probability，评估 Brier/ECE。
+总损失：
 
-这套指标不需要额外人工标注，能快速落地。
+```text
+L = L_stage + lambda_B L_boundary + lambda_G L_gate + lambda_C L_consistency
+```
 
-### 入手点 B：比较“上下文长度 × 转期类型”
+### 4.1 主分类损失
 
-固定一个轻量 backbone，比较：
+使用 stage CE 或 class-balanced CE：
 
-- 30 秒单 epoch；
-- 5 分钟上下文，约 10 个 epoch；
-- 30 分钟上下文，约 60 个 epoch；
-- 90 分钟 whole-cycle，约 180 个 epoch；
-- 整夜上下文。
+```text
+L_stage = CE(y_hat_t, y_t)
+```
 
-不要只看总体指标。要按转期类型拆开看：
+N1 类别少，建议保留 class-balanced CE 作为默认主损失，但不要把 class imbalance 写成主贡献。
 
-- W/N1/N2 入睡链；
-- N2/N3 深睡边界；
-- N2/REM 或 NREM/REM 周期边界；
-- REM/W 或夜间觉醒边界。
+### 4.2 转期监督损失
 
-预期可能出现的结果是：短上下文对 N1 最有效；N2-N3 更依赖局部慢波；90 分钟上下文可能只对 REM 周期有用；整夜上下文可能收益不稳定。
+用自动生成的 `b_t` 监督 transition head：
 
-### 入手点 C：轻量 transition-aware regularization
+```text
+L_boundary = BCE(p_t^B, b_t)
+```
 
-推荐先做三类方法，保持实现简单：
+该 head 的角色是为 context gate 提供控制信号，而不是作为最终贡献。
 
-1. **Transition-aware sample weighting**  
-   对真实转期前后 k 个 epoch 加权，权重随距离边界衰减。它直接优化转期窗口，不改变模型结构。
+### 4.3 Gate regularization
 
-2. **Boundary-aware consistency loss**  
-   对非转期稳定片段约束相邻预测分布一致；对转期窗口不施加平滑，避免抹掉真实边界。
+对稳定片段施加短上下文偏置：
 
-3. **Transition prior / CRF-style penalty**  
-   用训练 hypnogram 估计 transition matrix，对低概率跳变施加软惩罚，或在推理时做 Viterbi/CRF decoding。注意惩罚不能太强，否则会降低短觉醒召回。
+```text
+if b_t = 0: encourage g_t^S high
+```
 
-可选第 4 类是 transition detection auxiliary head，但 TransSleep 已经做过，最好作为 ablation 或辅助，不作为唯一创新。
+对转期窗口不强制使用长上下文，只允许 gate 自适应分配：
 
-## 5. 推荐第一篇文章故事线
+```text
+if b_t = 1: avoid collapsing to only short context
+```
 
-暂定题目方向：
+这能避免模型学成普通固定短上下文模型，也避免全局无差别长上下文。
 
-> **When Does Context Help? Transition-Centered Evaluation and Lightweight Sequence Regularization for EEG Sleep Staging**
+### 4.4 Stable consistency
 
-中文表述：
+只在非转期稳定片段约束相邻预测一致：
 
-> **上下文什么时候真的有用？面向睡眠阶段转换的 EEG 睡眠分期评测与轻量序列正则化**
+```text
+if b_t = 0 and b_{t+1} = 0:
+  minimize KL(p_t || p_{t+1})
+```
 
-文章主线：
+转期窗口不施加平滑约束，避免抹平真实边界、延迟阶段转换或降低短觉醒召回。
 
-1. 现有 EEG 睡眠分期普遍使用上下文，但主要按普通 epoch-level 指标评价。
-2. 这些指标掩盖了临床上更关键的 hypnogram 边界错误、碎片化和转期延迟。
-3. 我们提出 transition-centered evaluation protocol，系统分析不同上下文长度对不同转期类型的影响。
-4. 我们提出轻量 transition-aware regularization，在固定 backbone 下减少边界错误。
-5. 如果超长上下文无明显收益，这不是失败，而是结论：睡眠分期需要“合适上下文”，不是“无限长上下文”。
+## 5. 实验设计
 
-## 6. 最小可行实验协议
+### 5.1 数据集
 
-### 数据
+第一阶段：
 
-第一阶段只用 Sleep-EDF Expanded 快速跑通。建议用 Fpz-Cz 作为主通道，Pz-Oz 做补充。划分必须 subject-independent。
+- Sleep-EDF Expanded；
+- subject-independent split；
+- 单通道 Fpz-Cz；
+- 标签统一为 W/N1/N2/N3/REM。
 
-第二阶段加入 ISRUC 或 MASS 做外部验证。SHHS 数据价值高，但申请和处理成本更大，不作为第一轮必需。
+第二阶段：
 
-### Baseline
+- ISRUC 或 MASS；
+- 用于外部验证，而不是第一阶段调参。
 
-- B0：single-epoch CNN/TCN。
-- B1：5 分钟上下文模型。
-- B2：30 分钟上下文模型。
-- B3：90 分钟 whole-cycle 模型。
-- B4：整夜上下文模型。
+SHHS 可作为增强验证，但访问和预处理成本较高，不作为第一版必要条件。
 
-第一轮只需要 B0/B1/B2 + M1/M3，就能判断方向是否有信号。
+### 5.2 对照模型
 
-### 方法
+必须包含：
 
-- M1：transition-aware sample weighting。
-- M2：transition prior / CRF-style penalty。
-- M3：boundary-aware consistency loss。
-- M4：transition detection auxiliary head。
+- **B0 single-epoch baseline**：无上下文；
+- **B1 fixed short context**：固定短上下文；
+- **B2 fixed mid context**：固定中上下文；
+- **B3 fixed long context**：固定 90 分钟上下文；
+- **B4 transition auxiliary baseline**：只加 transition head，不做 gate，用作 TransSleep-style 对照；
+- **TGCM**：转期引导的自适应上下文融合。
 
-推荐执行顺序：
+这样可以证明 TGCM 的收益不是来自“多一个辅助任务”，也不是来自“上下文更长”。
 
-1. 先实现转期指标。
-2. 跑 B0/B1/B2。
-3. 加 M1，看 transition-window macro-F1 和 N1 是否提升。
-4. 加 M3，看 fragmentation error 是否下降且 boundary delay 不恶化。
-5. 若有效，再做 M2/M4 和 B3/B4。
+### 5.3 消融实验
 
-### 指标
+核心消融：
 
-常规指标保留：accuracy、macro-F1、kappa、per-stage F1。
+- TGCM w/o context gate：等价于固定融合多尺度上下文；
+- TGCM w/o transition supervision：gate 不显式知道转期；
+- TGCM w/o gate regularization：检查 gate 是否退化；
+- TGCM w/o stable consistency：检查碎片化是否上升；
+- TGCM with only short/mid/long branch：验证不同尺度的必要性。
 
-主指标改为：
+### 5.4 主要指标
+
+常规指标保留：
+
+- accuracy；
+- macro-F1；
+- Cohen's kappa；
+- per-stage F1。
+
+但主证据来自：
 
 - transition-window macro-F1；
 - W-N1-N2 transition F1；
@@ -218,53 +233,81 @@ N1 难识别不是单纯类别不均衡。它本质上是清醒到睡眠的过�
 - NREM-REM transition F1；
 - boundary delay；
 - fragmentation error；
-- transition calibration。
+- transition calibration；
+- gate 权重在稳定区/转期区的分布差异。
 
-主结论必须来自这些指标，不能只说 overall accuracy 涨了 0.3%。
+门控可视化是重要证据。论文应展示：
 
-## 7. 风险判断
+- 稳定 N2/N3 中 gate 是否偏 short；
+- W-N1-N2 边界是否提高 mid 权重；
+- NREM-REM 边界是否提高 mid/long 权重；
+- 预测错误时 gate 是否异常。
 
-### 风险 1：创新性中等
+## 6. 论文故事线
 
-上下文建模和 transition auxiliary task 都有人做过。解决方式：贡献放在评测协议、转期类型分析和轻量正则，不主张模型结构 SOTA。
+建议标题：
 
-### 风险 2：长上下文收益不显著
+> **Transition-Guided Context Modulation for EEG Sleep Staging**
 
-这不是致命风险。可以转成负结果贡献：不是所有转期都需要长上下文；短/中上下文可能已足够；超长上下文可能只增加成本。
+中文表达：
 
-### 风险 3：序列正则损害短觉醒
+> **面向 EEG 睡眠分期的转期引导自适应上下文调制方法**
 
-这正是文章可分析的点。需要同时报告 fragmentation error、boundary delay 和 wake/REM 边界召回，避免只追求平滑 hypnogram。
+摘要主线：
 
-### 风险 4：Sleep-EDF 规模偏小
+1. EEG 睡眠分期依赖上下文，但现有方法通常使用固定或隐式上下文。
+2. 固定上下文不能区分稳定 epoch 与转期 epoch，可能造成边界延迟、hypnogram 过度平滑和 N1 误判。
+3. 我们提出 TGCM，用转期概率动态融合 short/mid/long 多尺度上下文。
+4. 通过边界感知训练目标，模型在稳定区保持一致，在转期区保留变化敏感性。
+5. 实验表明 TGCM 改善转期窗口表现并保持常规分期性能。
 
-第一阶段用 Sleep-EDF 打样可以，但文章正式版至少应加入 ISRUC 或 MASS。否则结论容易被认为是小数据集调参。
+贡献写法：
 
-## 8. 下一步建议
+- 提出一个转期引导的自适应上下文调制模块，用于 EEG 睡眠分期；
+- 设计边界感知训练目标，使上下文建模在稳定区与转期区行为不同；
+- 通过转期窗口指标和 gate 可视化证明模型确实学习到不同阶段边界的上下文需求。
 
-我建议下一步进入小规模实验准备，而不是继续泛读：
+## 7. 风险与规避
 
-1. 实现 hypnogram transition metrics。
-2. 下载/整理 Sleep-EDF。
-3. 复现一个轻量 CNN/TCN baseline。
-4. 先跑 B0/B1/B2，验证“上下文长度 × 转期类型”的初始图。
-5. 如果 transition-window 指标出现清晰差异，再加入 M1/M3。
+### 风险 1：被认为只是 TransSleep 变体
 
-第一张关键图应该是：
+规避方式：
 
-> 不同上下文长度在不同转期类型上的 transition-window macro-F1 / boundary delay 对比。
+- 不把 transition head 写成主贡献；
+- 强调 transition head 只是 gate 的控制信号；
+- 重点展示 adaptive context weights，而不是只展示辅助任务提升。
 
-如果这张图有结构性差异，这篇文章就有可写性。
+### 风险 2：gate 学不到清晰模式
 
-## 9. 参考入口
+规避方式：
 
-- SleepTransformer: https://arxiv.org/abs/2105.11043
+- 加入 gate regularization；
+- 报告稳定区与转期区 gate 分布；
+- 做 w/o transition supervision 消融。
+
+### 风险 3：长上下文仍无明显收益
+
+这不致命。TGCM 的假设不是“长上下文总有用”，而是“按转期状态选择上下文更合理”。如果 long branch 权重整体很低，但 mid branch 在特定转期上升，仍支持自适应机制。
+
+### 风险 4：总体 accuracy 提升很小
+
+可接受。文章应提前声明主目标是转期边界质量，而不是整体 accuracy 小幅 SOTA。关键是 transition-window 指标、boundary delay 和 gate 解释要有一致证据。
+
+## 8. 下一步执行顺序
+
+1. 更新 protocol，锁定 TGCM 为主方法。
+2. 实现 transition label generation 与 transition metrics。
+3. 实现 B0/B1/B2/B3/B4 基线。
+4. 实现 TGCM：multi-scale context branches + transition head + context gate。
+5. 先在 Sleep-EDF 跑小规模 sanity check。
+6. 完整运行 subject-independent evaluation。
+7. 加入 ISRUC 或 MASS 做外部验证。
+
+## 9. 参考边界
+
 - TransSleep: https://arxiv.org/abs/2203.12590
-- ProductGraphSleepNet: https://arxiv.org/abs/2212.04881
+- SleepTransformer: https://arxiv.org/abs/2105.11043
 - L-SeqSleepNet: https://arxiv.org/abs/2301.03441
-- Continuous sleep depth: https://arxiv.org/abs/2301.06755
 - S4Sleep: https://arxiv.org/abs/2310.06715
 - Long-range correlations analysis: https://arxiv.org/abs/2402.17779
-- NeuroLingua: https://arxiv.org/abs/2511.09773
-- AnySleep: https://arxiv.org/abs/2512.14461
 - Context-aware temporal modeling: https://arxiv.org/abs/2512.22976

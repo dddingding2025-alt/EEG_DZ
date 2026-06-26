@@ -3,7 +3,31 @@
 
 # Local datasets and experiment outputs are usually too large for Git.
 data/
-experiments/
+experiments/*
+!experiments/n1_label_uncertainty/
+!experiments/n1_label_uncertainty/protocol.md
+!experiments/transition_uncertainty_guided_n1/
+!experiments/transition_uncertainty_guided_n1/protocol.md
+!experiments/transition_uncertainty_guided_n1/configs/
+!experiments/transition_uncertainty_guided_n1/configs/*.yaml
+!experiments/transition_uncertainty_guided_n1/runs/
+!experiments/transition_uncertainty_guided_n1/runs/.gitkeep
+!experiments/transition_uncertainty_guided_n1/runs/latest.json
+!experiments/transition_uncertainty_guided_n1/runs/*/
+!experiments/transition_uncertainty_guided_n1/runs/*/status.json
+!experiments/transition_uncertainty_guided_n1/runs/*/metrics.csv
+!experiments/transition_uncertainty_guided_n1/runs/*/summary.json
+!experiments/transition_uncertainty_guided_n1/runs/*/analysis.md
+!experiments/transition_uncertainty_guided_n1/runs/*/*.png
+!experiments/transition-aware-long-context/
+!experiments/transition-aware-long-context/protocol.md
+
+*.pt
+*.pth
+*.ckpt
+*.log
+checkpoints/
+logs/
 
 __pycache__/
 *.pyc

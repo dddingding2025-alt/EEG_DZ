@@ -77,6 +77,8 @@
 
 用户选择“转期感知长上下文睡眠分期”作为第一篇文章方向后，补充筛选了 20 篇 temporal context / transition-aware / whole-cycle / high-resolution staging 相关论文。详表见 `literature/transition_context_survey.md`。
 
+2026-06-26 修订：该方向不再以“转期评测协议”作为主创新，而是收束为 **Transition-Guided Context Modulation (TGCM)**。核心差异是用转期概率动态调制 short/mid/long 上下文融合；转期指标和 gate 可视化用于验证机制有效。
+
 新增重点条目：
 
 | 年份 | 论文 | 价值 | 链接 |
@@ -90,9 +92,9 @@
 | 2025 | AnySleep | adjustable temporal resolution，说明 30 秒 epoch 不是自然边界 | https://arxiv.org/abs/2512.14461 |
 | 2025 | Context-Aware Temporal Modeling | 强调 N1、局部-长程上下文和可解释性 | https://arxiv.org/abs/2512.22976 |
 
-## 4. 方向1专题补充：N1、标签不确定性与跨数据集泛化
+## 5. 方向1专题补充：N1标签不确定性、相邻软标签与转期不确定性
 
-本节用于支撑 `to_human/direction1_n1_uncertainty_cross_dataset_report.md`。它把 N1 难题拆成 class imbalance、label uncertainty 和 domain shift 三类机制。
+本节用于支撑 `to_human/direction1_n1_label_uncertainty_report.md` 和 `literature/n1_label_uncertainty_survey.md`。根据用户反馈，本方向不再把 domain shift / 跨数据集泛化作为核心机制；跨数据集只保留为后续 robustness check。主线改为：N1 的 class imbalance、label uncertainty、W-N1-N2 阶段相邻性和转期边界不确定性。
 
 | # | 年份 | 类型 | 论文/资料 | 直接相关点 | 链接 |
 |---:|---:|---|---|---|---|
@@ -101,19 +103,32 @@
 | D3 | 2021 | Method | SleepTransformer | Transformer、attention 解释、不确定性熵 | https://arxiv.org/abs/2105.11043 |
 | D4 | 2021 | Method | MSDAN | 明确针对 N1 表现差，多尺度注意力 | https://arxiv.org/abs/2107.08442 |
 | D5 | 2023 | Method | SleepEGAN | 少数类增强、class imbalance、ensemble | https://arxiv.org/abs/2307.05362 |
-| D6 | 2024 | DG | SleepDG / Generalizable Sleep Staging | 多数据集 domain generalization | https://arxiv.org/abs/2401.05363 |
-| D7 | 2024 | Adaptation | SPDIM | source-free adaptation、label shift | https://arxiv.org/abs/2411.07249 |
-| D8 | 2025 | Transfer | SelectiveFinetuning | source selection、negative transfer | https://arxiv.org/abs/2501.03764 |
+| D6 | 2024 | Robustness background | SleepDG / Generalizable Sleep Staging | 多数据集 domain generalization，作为后续鲁棒性背景 | https://arxiv.org/abs/2401.05363 |
+| D7 | 2024 | Robustness background | SPDIM | source-free adaptation、label shift，作为后续部署背景 | https://arxiv.org/abs/2411.07249 |
+| D8 | 2025 | Robustness background | SelectiveFinetuning | source selection、negative transfer，作为后续跨数据集背景 | https://arxiv.org/abs/2501.03764 |
 | D9 | 2025 | Interpretability | Retrieving Filter Spectra in CNN | EEG 频带解释，检查是否学到合理证据 | https://arxiv.org/abs/2502.06478 |
-| D10 | 2025 | Cross-domain | SleepDIFFormer | heterogeneous EEG/EOG、跨域对齐 | https://arxiv.org/abs/2508.15215 |
-| D11 | 2025 | TTA | StableSleep | source-free test-time adaptation、entropy gate | https://arxiv.org/abs/2509.02982 |
-| D12 | 2025 | Wearable SSL | Systematic Evaluation of SSL for Wearable EEG | 少标签、可穿戴、跨数据集泛化 | https://arxiv.org/abs/2510.07960 |
+| D10 | 2025 | Robustness background | SleepDIFFormer | heterogeneous EEG/EOG、跨域对齐，作为后续鲁棒性背景 | https://arxiv.org/abs/2508.15215 |
+| D11 | 2025 | Uncertainty / TTA | StableSleep | source-free test-time adaptation、entropy gate，可借鉴 entropy gating | https://arxiv.org/abs/2509.02982 |
+| D12 | 2025 | Wearable SSL | Systematic Evaluation of SSL for Wearable EEG | 少标签、可穿戴、跨数据集泛化，作为后续扩展 | https://arxiv.org/abs/2510.07960 |
 | D13 | 2025 | N1 method | Context-Aware Temporal Modeling for Single-Channel EEG | N1 F1、上下文、class-weighted loss | https://arxiv.org/abs/2512.22976 |
 | D14 | 2026 | Clinical transfer | Fully-Automated Sleep Staging in PD/iRBD | 疾病人群迁移、人工二次评分、REM 置信阈值 | https://arxiv.org/abs/2602.09793 |
 | D15 | 2026 | Clinical gap | AI Generalisation Gap in Comorbid Sleep Disorder Staging | 病理人群泛化缺口、解释性错误分析 | https://arxiv.org/abs/2603.23582 |
-| D16 | 2026 | Noisy-label DG | FF-TRUST / NL-DGSS | noisy labels + multi-source domain generalization | https://arxiv.org/abs/2604.10009 |
-| D17 | 2026 | Cross-dataset DA | STDA-Net | Sleep-EDF 与 SHHS 跨数据集适配 | https://arxiv.org/abs/2605.06736 |
+| D16 | 2026 | Robustness background | FF-TRUST / NL-DGSS | noisy labels + multi-source domain generalization，说明 label noise 与 domain shift 可共存但不应混成同一主问题 | https://arxiv.org/abs/2604.10009 |
+| D17 | 2026 | Robustness background | STDA-Net | Sleep-EDF 与 SHHS 跨数据集适配，作为后续 robustness baseline | https://arxiv.org/abs/2605.06736 |
 | D18 | 2026 | FM eval | Multi-Dimensional EEG Foundation Model Evaluation | 低资源、少传感器、长上下文任务评测 | https://arxiv.org/abs/2605.28563 |
 | D19 | 2026 | Sleep FM | Hypnos / Next-Token Prediction | 大规模 sleep foundation model、label efficiency | https://arxiv.org/abs/2606.09605 |
 
-方向1的直接竞争线是 D6、D10、D16、D17；直接支撑标签不确定性的是 D1、D2、D3、D11；直接支撑 N1 难点的是 D4、D5、D13。
+方向1的直接支撑线是 D1、D2、D3、D11 的不确定性建模，D4、D5、D13 的 N1 / class imbalance / temporal context 研究，以及 LSSC 多评分员 soft-consensus 方法。D6、D7、D8、D10、D16、D17 不再作为方向1直接竞争线，而是后续跨数据集鲁棒性背景。
+
+## 6. 统一规划：转期不确定性引导的 N1 识别
+
+2026-06-26 后，方向1与方向2不再作为两个并列论文主题推进，而是统一为“转期/边界不确定性引导的 N1 睡眠阶段识别”。第一篇文章主线是 N1 标签不确定性，TGCM 作为第二阶段增强模块。
+
+统一规划的证据链如下：
+
+- D1/LSSC/D2/D3 支撑标签不确定性、多评分员分歧和模型不确定性；
+- D4/D5/D13 支撑 N1 难题和 class imbalance baseline 必要性；
+- TransSleep/L-SeqSleepNet/S4Sleep/长相关性分析支撑上下文和转期建模背景；
+- SleepDG/STDA-Net/FF-TRUST 等跨数据集工作只作为 robustness 背景，不作为主贡献。
+
+后续实验应先验证 stage-adjacent soft label 与 transition-window uncertainty 是否改善 N1 F1、transition-window N1 F1 和校准；只有在该主假设成立或需要解释上下文需求时，再引入 TGCM。

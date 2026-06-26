@@ -12,13 +12,48 @@
 - 建立 20 分钟 heartbeat：`autoresearch-transition-aware-sleep-staging`，用于持续推进本线程 autoresearch。
 - 完成第二轮专题调研：新增 `literature/transition_context_survey.md`、`to_human/transition_aware_sleep_staging_report.md`、`experiments/transition-aware-long-context/protocol.md`。
 - 新增关键论文卡片：TransSleep、L-SeqSleepNet、S4Sleep、长相关性分析、continuous sleep depth、NeuroLingua、context-aware temporal modeling、ProductGraphSleepNet。
-- 第二轮判断：该方向可作为第一篇文章，但贡献应聚焦 transition-centered evaluation 和轻量 sequence regularization，而非单纯更长上下文模型。
+- 第二轮当时判断：该方向可作为第一篇文章，但贡献应聚焦 transition-centered evaluation 和轻量 sequence regularization，而非单纯更长上下文模型；该表述已在 2026-06-26 被 TGCM 方法化修订取代。
 
 ## 2026-06-25 方向1深化
 
 - 针对用户提出的“跨数据集泛化”不清楚的问题，形成正式解释：训练集和测试集来自不同数据集/中心/设备/人群，用于检验模型是否学到可迁移睡眠规律。
-- 新增方向1专题报告：`to_human/direction1_n1_uncertainty_cross_dataset_report.md`。
-- 新增实验协议草案：`experiments/n1_label_uncertainty_cross_dataset/protocol.md`。
+- 新增方向1专题报告：`to_human/direction1_n1_label_uncertainty_report.md`。
+- 新增实验协议草案：`experiments/n1_label_uncertainty/protocol.md`。
 - 补充方向1文献链：19 条 N1、multi-rater、uncertainty、label noise、domain generalization、cross-dataset adaptation 相关条目。
 - 新增 9 张论文卡片，使 `literature/papers/` 累计达到 40 张。
-- 形成三个可执行假设：stage-adjacent soft label、transition-aware training、label uncertainty + domain generalization 联合建模。
+- 当时形成三个可执行假设：stage-adjacent soft label、transition-aware training、label uncertainty + domain generalization 联合建模；第三项已在 2026-06-26 修订为后续 robustness check，不再作为方向1核心机制。
+
+## 2026-06-26 方向1修订
+
+- 根据用户反馈，确认 `Domain shift / 跨数据集泛化` 不应与 N1 标签不确定性绑定为同一核心问题；跨数据集泛化改为后续 robustness check。
+- 研究主线修订为：通过阶段相邻软标签与转期不确定性建模提升 N1 睡眠阶段识别。
+- 修订方向1汇报：`to_human/direction1_n1_label_uncertainty_report.md`，删除“跨数据集泛化”作为标题和主贡献。
+- 新增专题文献报告：`literature/n1_label_uncertainty_survey.md`，按 class imbalance、transition/context、multi-rater uncertainty、soft label、medical label uncertainty 五类整理。
+- 修订实验协议：`experiments/n1_label_uncertainty/protocol.md`，主设置改为 Sleep-EDF 与 ISRUC 的 subject-independent within-dataset evaluation。
+- 更新 `findings.md`、`literature/survey.md` 和 `research-state.yaml`，确保后续执行聚焦 N1 标签不确定性而非 domain shift。
+
+## 2026-06-26 方向2方法化修订
+
+- 根据用户反馈，确认原“转期感知长上下文”方案偏实验创新，方法贡献不足。
+- 将方向2正式修订为方法主导方案：Transition-Guided Context Modulation (TGCM)。
+- 更新 `to_human/transition_aware_sleep_staging_report.md`，把文章主线改为“转期概率动态调制 short/mid/long 上下文尺度”。
+- 更新 `experiments/transition-aware-long-context/protocol.md`，锁定 TGCM 的方法结构、训练目标、baseline、ablation 和验收标准。
+- 更新 `findings.md` 和 `research-state.yaml`，确保后续研究状态聚焦 TGCM，而不是 transition-centered evaluation 本身。
+
+## 2026-06-26 统一研究方案
+
+- 根据用户要求，将 N1 标签不确定性与 TGCM 的重叠点统一为“转期/边界不确定性”。
+- 明确第一篇文章主线为 N1 标签不确定性：stage-adjacent soft label + transition-window uncertainty。
+- 明确 TGCM 作为第二阶段增强模块，用于验证边界不确定样本是否需要自适应上下文尺度。
+- 新增统一研究规划：`to_human/n1_transition_uncertainty_research_plan.md`。
+- 新增统一实验前注册 protocol：`experiments/transition_uncertainty_guided_n1/protocol.md`。
+- 更新 `research-state.yaml` 与 `findings.md`，后续执行顺序改为先 Sleep-EDF N1 soft-label 方法，再 ISRUC 复现，最后 TGCM 扩展。
+
+## 2026-06-26 GitHub-服务器协作框架
+
+- 根据用户说明，本机无 GPU，实验转为远程服务器执行；协作分支固定为 `codex/n1-label-uncertainty`。
+- 新增 N1 不确定性工具包：`src/n1_uncertainty/`，包含标签映射、转期窗口、soft label、metrics、状态写出、NPZ 训练入口和结果监控。
+- 新增远程脚本：`scripts/remote/run_experiment.sh`、`sync_results.sh`、`watch_and_sync.sh`、`check_status.sh`。
+- 新增实验配置：`smoke_synthetic.yaml`、`baseline_sleepedf.yaml`、`softlabel_sleepedf.yaml`、`replicate_isruc.yaml`、`tgcm_sleepedf.yaml`。
+- 新增协作指南：`to_human/github_server_collaboration_guide.md`，规定服务器部署、tmux 运行、结果同步和 Codex 监控逻辑。
+- 本机 Python 不可访问，未能执行本地 Python smoke test；应由服务器先执行 `bash scripts/remote/run_experiment.sh --smoke`。

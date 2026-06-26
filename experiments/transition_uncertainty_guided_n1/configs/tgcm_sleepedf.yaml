@@ -1,0 +1,37 @@
+name: tgcm_sleepedf
+stage: phase4_tgcm_extension
+status: placeholder_until_tgcm_model_is_implemented
+runs_root: experiments/transition_uncertainty_guided_n1/runs
+data:
+  synthetic: false
+  dataset: sleepedf
+  format: npz
+  path: ${DATA_ROOT}/sleepedf/preprocessed.npz
+transition:
+  k: 2
+training:
+  seed: 42
+  epochs: 20
+  batch_size: 128
+  lr: 0.001
+variants:
+  - id: fixed_short_context
+    loss: hard_ce
+    context: short
+  - id: fixed_mid_context
+    loss: hard_ce
+    context: mid
+  - id: fixed_long_context
+    loss: hard_ce
+    context: long
+  - id: only_transition_head
+    loss: hard_ce
+    transition_head: true
+  - id: tgcm
+    loss: hard_ce
+    context_gate: true
+  - id: tgcm_hybrid_softlabel
+    loss: hybrid
+    context_gate: true
+    epsilon: 0.05
+    transition_epsilon: 0.15

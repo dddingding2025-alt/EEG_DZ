@@ -26,7 +26,8 @@ fi
 
 git add "$RUNS_DIR" || true
 if git diff --cached --quiet; then
-  echo "No result changes to sync."
+  echo "No new result changes to commit. Pushing any pending local commits."
+  git push origin HEAD:"$BRANCH"
   exit 0
 fi
 
@@ -39,4 +40,4 @@ PY
 )"
 
 git commit -m "research(results): sync ${RUN_ID}"
-git push origin "$BRANCH"
+git push origin HEAD:"$BRANCH"

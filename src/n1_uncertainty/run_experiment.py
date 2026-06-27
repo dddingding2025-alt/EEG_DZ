@@ -33,7 +33,6 @@ def main() -> int:
         "run_id": run_id,
         "git_commit": git_commit(),
         "hostname": socket.gethostname(),
-        "cuda_available": cuda_available(),
         "stage": cfg.get("stage", "unknown"),
         "state": "running",
         "epoch": 0,
@@ -41,6 +40,7 @@ def main() -> int:
         "best_transition_n1_f1": 0.0,
         "last_error": "",
     }
+    status.update(cuda_info())
     write_status(run_dir, status)
 
     try:
@@ -121,14 +121,34 @@ def git_commit() -> str:
 
 
 def cuda_available() -> bool:
+    return bool(cuda_info().get("cuda_available", False))
+
+
+def cuda_info() -> dict[str, object]:
+    info: dict[str, object] = {
+        "cuda_available": False,
+        "cuda_visible_devices": os.environ.get("CUDA_VISIBLE_DEVICES"),
+        "torch_version": "",
+        "torch_cuda_runtime": "",
+        "cuda_device_count": 0,
+        "cuda_current_device": None,
+        "cuda_device_name": "",
+    }
     if os.environ.get("CUDA_VISIBLE_DEVICES") == "":
-        return False
+        return info
     try:
         import torch
 
-        return bool(torch.cuda.is_available())
+        info["torch_version"] = torch.__version__
+        info["torch_cuda_runtime"] = torch.version.cuda or ""
+        info["cuda_available"] = bool(torch.cuda.is_available())
+        if torch.cuda.is_available():
+            info["cuda_device_count"] = int(torch.cuda.device_count())
+            info["cuda_current_device"] = int(torch.cuda.current_device())
+            info["cuda_device_name"] = torch.cuda.get_device_name(torch.cuda.current_device())
+        return info
     except Exception:
-        return False
+        return info
 
 
 if __name__ == "__main__":

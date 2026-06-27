@@ -31,6 +31,19 @@ git config user.email "remote-runner@example.com"
 
 服务器驱动为 NVIDIA 535.x / CUDA 12.2 时，默认使用 `requirements-cu121.txt` 安装 `torch==2.5.1+cu121`。不要直接运行 `pip install torch`，否则 pip 可能装到 CPU 版或需要更高驱动的 CUDA 轮子。
 
+如果服务器有多张显卡，运行实验时用 `--gpu` 指定物理显卡编号。脚本会设置 `CUDA_VISIBLE_DEVICES`，训练程序内部看到的仍是 `cuda:0`，但实际对应你指定的那张物理卡：
+
+```bash
+bash scripts/remote/run_experiment.sh --gpu 1 baseline_sleepedf
+```
+
+等价写法：
+
+```bash
+GPU_ID=1 bash scripts/remote/run_experiment.sh baseline_sleepedf
+CUDA_VISIBLE_DEVICES=1 bash scripts/remote/run_experiment.sh baseline_sleepedf
+```
+
 第一版真实训练默认读取：
 
 ```text
@@ -90,7 +103,7 @@ unset MAX_PAIRS
 tmux new -s n1_smoke
 conda activate eeg-n1
 cd EEG_DZ
-bash scripts/remote/run_experiment.sh --smoke
+bash scripts/remote/run_experiment.sh --gpu 0 --smoke
 bash scripts/remote/sync_results.sh
 ```
 
@@ -112,7 +125,7 @@ conda activate eeg-n1
 cd EEG_DZ
 git pull --ff-only
 export DATA_ROOT=/path/to/eeg_data
-bash scripts/remote/run_experiment.sh baseline_sleepedf
+bash scripts/remote/run_experiment.sh --gpu 0 baseline_sleepedf
 ```
 
 另开一个 tmux 或在训练结束后同步：
@@ -133,7 +146,7 @@ git checkout codex/n1-label-uncertainty
 git pull --ff-only
 conda activate eeg-n1
 bash scripts/remote/install_server_deps.sh
-bash scripts/remote/run_experiment.sh --resume <run_id> baseline_sleepedf
+bash scripts/remote/run_experiment.sh --gpu 0 --resume <run_id> baseline_sleepedf
 ```
 
 如果不是 baseline，请把最后的配置名替换为：

@@ -7,6 +7,23 @@ cd "$ROOT_DIR"
 BRANCH="${BRANCH:-codex/n1-label-uncertainty}"
 RUNS_DIR="experiments/transition_uncertainty_guided_n1/runs"
 
+USER_NAME="$(git config --get user.name || true)"
+USER_EMAIL="$(git config --get user.email || true)"
+if [[ -z "$USER_NAME" || -z "$USER_EMAIL" ]]; then
+  cat <<'EOF'
+Git commit identity is not configured on this server.
+
+Run these once inside the EEG_DZ repository:
+
+  git config user.name "remote-runner"
+  git config user.email "remote-runner@example.com"
+
+This only sets the commit author for result-sync commits. If push still fails
+after that, configure GitHub authentication with SSH or `gh auth login`.
+EOF
+  exit 2
+fi
+
 git add "$RUNS_DIR" || true
 if git diff --cached --quiet; then
   echo "No result changes to sync."

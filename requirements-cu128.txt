@@ -1,0 +1,5 @@
+# Server GPU environment for NVIDIA RTX 50-series / Blackwell GPUs.
+# PyTorch cu128 wheels are required for sm_120 devices such as RTX 5060 Ti.
+-r requirements.txt
+--extra-index-url https://download.pytorch.org/whl/cu128
+torch==2.7.0+cu128

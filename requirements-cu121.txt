@@ -1,0 +1,5 @@
+# Server GPU environment for NVIDIA driver 535.x / CUDA 12.2.
+# PyTorch cu121 wheels are compatible with a CUDA 12.2-capable driver.
+-r requirements.txt
+--extra-index-url https://download.pytorch.org/whl/cu121
+torch==2.5.1+cu121

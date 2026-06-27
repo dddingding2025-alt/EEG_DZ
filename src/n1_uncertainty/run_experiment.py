@@ -93,7 +93,10 @@ def run_npz_training(cfg: dict, run_dir: Path) -> dict:
     try:
         from .training import run_training_variants
     except ImportError as exc:  # pragma: no cover - depends on server torch install.
-        raise RuntimeError("training requires torch; run `pip install -r requirements.txt`") from exc
+        raise RuntimeError(
+            "training requires torch; on the CUDA 12.2 server run "
+            "`bash scripts/remote/install_server_deps.sh`"
+        ) from exc
 
     data_path = Path(cfg.get("data", {}).get("path", ""))
     if not data_path.exists():

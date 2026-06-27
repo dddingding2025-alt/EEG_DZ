@@ -21,13 +21,15 @@ git checkout codex/n1-label-uncertainty
 
 conda create -n eeg-n1 python=3.10 -y
 conda activate eeg-n1
-pip install -r requirements.txt
+bash scripts/remote/install_server_deps.sh
 
 export DATA_ROOT=/path/to/eeg_data
 export RUN_ROOT=/path/to/eeg_runs
 git config user.name "remote-runner"
 git config user.email "remote-runner@example.com"
 ```
+
+服务器驱动为 NVIDIA 535.x / CUDA 12.2 时，默认使用 `requirements-cu121.txt` 安装 `torch==2.5.1+cu121`。不要直接运行 `pip install torch`，否则 pip 可能装到 CPU 版或需要更高驱动的 CUDA 轮子。
 
 第一版真实训练默认读取：
 
@@ -68,7 +70,7 @@ Sleep-EDF 原始 EDF 转换命令：
 conda activate eeg-n1
 cd EEG_DZ
 git pull --ff-only
-pip install -r requirements.txt
+bash scripts/remote/install_server_deps.sh
 export DATA_ROOT=~/data
 bash scripts/remote/prepare_sleepedf.sh
 bash scripts/remote/inspect_data.sh sleepedf
@@ -130,7 +132,7 @@ git fetch origin
 git checkout codex/n1-label-uncertainty
 git pull --ff-only
 conda activate eeg-n1
-pip install -r requirements.txt
+bash scripts/remote/install_server_deps.sh
 bash scripts/remote/run_experiment.sh --resume <run_id> baseline_sleepedf
 ```
 
